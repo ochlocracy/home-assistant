@@ -3037,3 +3037,27 @@ async def test_media_player_eq_bands_not_supported(hass):
     assert msg["header"]["name"] == "ErrorResponse"
     assert msg["header"]["namespace"] == "Alexa"
     assert msg["payload"]["type"] == "INVALID_DIRECTIVE"
+
+
+async def test_relationships_not_in_discovery(hass, events):
+    """Test relationships object not in discovery."""
+    device = ("switch.test", "on", {"friendly_name": "Test switch"})
+    appliance = await discovery_test(device, hass)
+
+    assert "relationships" not in appliance
+
+
+async def test_connections_not_in_discovery(hass, events):
+    """Test connections object not in discovery."""
+    device = ("switch.test", "on", {"friendly_name": "Test switch"})
+    appliance = await discovery_test(device, hass)
+
+    assert "connections" not in appliance
+
+
+async def test_additional_attributes_not_in_discovery(hass, events):
+    """Test additionalAttributes object not in discovery."""
+    device = ("switch.test", "on", {"friendly_name": "Test switch"})
+    appliance = await discovery_test(device, hass)
+
+    assert "additionalAttributes" not in appliance

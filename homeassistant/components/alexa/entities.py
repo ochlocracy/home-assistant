@@ -273,7 +273,6 @@ class AlexaEntity:
         """Return a relationships object.
 
         The endpoints that an endpoint is connected to.
-        For example, a computer endpoint might be connected to a home network endpoint.
         """
         return None
 
