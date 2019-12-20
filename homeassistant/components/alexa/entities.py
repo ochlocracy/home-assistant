@@ -252,6 +252,23 @@ class AlexaEntity:
         """
         raise NotImplementedError
 
+    @staticmethod
+    def connections():
+        """Return array of connection objects.
+
+        Information about the methods that the device uses to connect to the internet and smart home hubs.
+        """
+        return None
+
+    @staticmethod
+    def relationships():
+        """Return a relationships object.
+
+        The endpoints that an endpoint is connected to.
+        For example, a computer endpoint might be connected to a home network endpoint.
+        """
+        return None
+
     def serialize_properties(self):
         """Yield each supported property in API format."""
         for interface in self.interfaces():
@@ -260,7 +277,7 @@ class AlexaEntity:
 
     def serialize_discovery(self):
         """Serialize the entity for discovery."""
-        return {
+        result = {
             "displayCategories": self.display_categories(),
             "cookie": {},
             "endpointId": self.alexa_id(),
@@ -269,6 +286,16 @@ class AlexaEntity:
             "manufacturerName": "Home Assistant",
             "capabilities": [i.serialize_discovery() for i in self.interfaces()],
         }
+
+        connections = self.connections()
+        if connections is not None:
+            result["connections"] = connections
+
+        relationships = self.relationships()
+        if relationships is not None:
+            result["relationships"] = relationships
+
+        return result
 
 
 @callback
