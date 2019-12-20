@@ -253,6 +253,14 @@ class AlexaEntity:
         raise NotImplementedError
 
     @staticmethod
+    def additional_attributes():
+        """Return a additionalAttributes object.
+
+        Additional information about the endpoint.
+        """
+        return None
+
+    @staticmethod
     def connections():
         """Return array of connection objects.
 
@@ -286,6 +294,10 @@ class AlexaEntity:
             "manufacturerName": "Home Assistant",
             "capabilities": [i.serialize_discovery() for i in self.interfaces()],
         }
+
+        additional_attributes = self.additional_attributes()
+        if additional_attributes is not None:
+            result["additionalAttributes"] = additional_attributes
 
         connections = self.connections()
         if connections is not None:
