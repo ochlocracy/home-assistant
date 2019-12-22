@@ -1000,13 +1000,19 @@ async def async_api_set_mode(hass, config, directive, context):
     # Cover Position
     elif instance == f"{cover.DOMAIN}.{cover.ATTR_POSITION}":
         _, position = mode.split(".")
-
         if position == cover.STATE_CLOSED:
             service = cover.SERVICE_CLOSE_COVER
         elif position == cover.STATE_OPEN:
             service = cover.SERVICE_OPEN_COVER
         elif position == "custom":
             service = cover.SERVICE_STOP_COVER
+
+    # Light Effect
+    elif instance == f"{light.DOMAIN}.{light.ATTR_EFFECT}":
+        _, effect = mode.split(".")
+        if effect in (light.EFFECT_COLORLOOP, light.EFFECT_RANDOM, light.EFFECT_WHITE):
+            service = light.SERVICE_TURN_ON
+            data[light.ATTR_EFFECT] = effect
 
     else:
         msg = "Entity does not support directive"

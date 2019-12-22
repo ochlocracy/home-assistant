@@ -1229,6 +1229,16 @@ class AlexaModeController(AlexaCapability):
             ):
                 return f"{cover.ATTR_POSITION}.{mode}"
 
+        # Light Effect
+        if self.instance == f"{light.DOMAIN}.{light.ATTR_EFFECT}":
+            mode = self.entity.attributes.get(light.ATTR_EFFECT, None)
+            if mode in (
+                light.EFFECT_COLORLOOP,
+                light.EFFECT_RANDOM,
+                light.EFFECT_WHITE,
+            ):
+                return f"{light.ATTR_EFFECT}.{mode}"
+
         return None
 
     def configuration(self):
@@ -1271,6 +1281,22 @@ class AlexaModeController(AlexaCapability):
                 f"{cover.ATTR_POSITION}.custom",
                 ["Custom", AlexaGlobalCatalog.SETTING_PRESET],
             )
+            return self._resource.serialize_capability_resources()
+
+        # Light Effect Resources
+        effect_list = self.entity.attributes.get(light.ATTR_EFFECT_LIST)
+
+        if self.instance == f"{light.DOMAIN}.{light.ATTR_EFFECT}":
+            self._resource = AlexaModeResource(["Effect"], False)
+            if light.EFFECT_COLORLOOP in effect_list:
+                self._resource.add_mode(
+                    f"{light.ATTR_EFFECT}.{light.EFFECT_COLORLOOP}",
+                    ["Color Loop", "Rainbow"],
+                )
+            if light.EFFECT_RANDOM in effect_list:
+                self._resource.add_mode(
+                    f"{light.ATTR_EFFECT}.{light.EFFECT_RANDOM}", ["Random"]
+                )
             return self._resource.serialize_capability_resources()
 
         return None

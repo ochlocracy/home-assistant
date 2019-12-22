@@ -438,6 +438,10 @@ class LightCapabilities(AlexaEntity):
             yield AlexaColorController(self.entity)
         if supported & light.SUPPORT_COLOR_TEMP:
             yield AlexaColorTemperatureController(self.entity)
+        if supported & light.SUPPORT_EFFECT:
+            yield AlexaModeController(
+                self.entity, instance=f"{light.DOMAIN}.{light.ATTR_EFFECT}"
+            )
 
         yield AlexaEndpointHealth(self.hass, self.entity)
         yield Alexa(self.hass)
