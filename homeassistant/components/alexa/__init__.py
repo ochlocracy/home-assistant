@@ -26,6 +26,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 CONF_FLASH_BRIEFINGS = "flash_briefings"
+CONF_NOTIFICATIONS = "notifications"
 CONF_SMART_HOME = "smart_home"
 
 ALEXA_ENTITY_SCHEMA = vol.Schema(
@@ -33,6 +34,16 @@ ALEXA_ENTITY_SCHEMA = vol.Schema(
         vol.Optional(CONF_DESCRIPTION): cv.string,
         vol.Optional(CONF_DISPLAY_CATEGORIES): cv.string,
         vol.Optional(CONF_NAME): cv.string,
+    }
+)
+
+ALEXA_NOTIFICATIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(
+            CONF_ENDPOINT, default="https://api.amazonalexa.com/v1/proactiveEvents/"
+        ): cv.string,
+        vol.Optional(CONF_CLIENT_ID): cv.string,
+        vol.Optional(CONF_CLIENT_SECRET): cv.string,
     }
 )
 
@@ -63,6 +74,7 @@ CONFIG_SCHEMA = vol.Schema(
                     ],
                 )
             },
+            CONF_NOTIFICATIONS: vol.Any(ALEXA_NOTIFICATIONS_SCHEMA, None),
             # vol.Optional here would mean we couldn't distinguish between an empty
             # smart_home: and none at all.
             CONF_SMART_HOME: vol.Any(SMART_HOME_SCHEMA, None),

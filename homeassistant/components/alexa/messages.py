@@ -193,3 +193,33 @@ class AlexaResponse:
     def serialize(self):
         """Return response as a JSON-able data structure."""
         return self._response
+
+
+class AlexaProactiveEvent:
+    """Base class for Alexa proactive event notification."""
+
+    event_name = None
+
+    def __init__(self, payload=None):
+        """Initialize the notification."""
+        payload = payload or {}
+        self._response = {API_EVENT: {"name": self.event_name, API_PAYLOAD: payload}}
+
+    @property
+    def name(self):
+        """Return the name of this response."""
+        return self._response[API_EVENT]["name"]
+
+    def _properties(self):
+        context = self._response.setdefault(API_CONTEXT, {})
+        return context.setdefault("properties", [])
+
+    def serialize(self):
+        """Return response as a JSON-able data structure."""
+        return self._response
+
+
+class AlexaMessageAlert(AlexaProactiveEvent):
+    """Message reminder proactive event class"""
+
+    event_name = "AMAZON.MessageAlert.Activated"
