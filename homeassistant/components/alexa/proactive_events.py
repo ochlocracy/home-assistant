@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_TIMEOUT = 10
 
 
-async def async_send_changereport_message(
+async def async_send_proactive_event_message(
     hass, config, alexa_entity, *, invalidate_access_token=True
 ):
     """Send a proavtive event.
