@@ -4,7 +4,7 @@ import logging
 import voluptuous as vol
 
 from homeassistant.const import CONF_NAME
-from homeassistant.helpers import config_validation as cv, entityfilter
+from homeassistant.helpers import config_validation as cv, discovery, entityfilter
 
 from . import flash_briefings, intent, smart_home_http
 from .const import (
@@ -101,5 +101,10 @@ async def async_setup(hass, config):
     else:
         smart_home_config = smart_home_config or SMART_HOME_SCHEMA({})
         await smart_home_http.async_setup(hass, smart_home_config)
+        hass.async_create_task(
+            discovery.async_load_platform(
+                hass, "notify", DOMAIN, {CONF_NAME: DOMAIN, "config": "foo"}, config
+            )
+        )
 
     return True
