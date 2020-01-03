@@ -31,14 +31,16 @@ SYN_RESOLUTION_MATCH = "ER_SUCCESS_MATCH"
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.0Z"
 
+API_BODY = "body"
+API_CHANGE = "change"
+API_CONTEXT = "context"
 API_DIRECTIVE = "directive"
 API_ENDPOINT = "endpoint"
 API_EVENT = "event"
-API_CONTEXT = "context"
 API_HEADER = "header"
 API_PAYLOAD = "payload"
+API_REQUEST = "request"
 API_SCOPE = "scope"
-API_CHANGE = "change"
 
 CONF_DESCRIPTION = "description"
 CONF_DISPLAY_CATEGORIES = "display_categories"

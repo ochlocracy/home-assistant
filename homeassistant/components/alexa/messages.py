@@ -3,12 +3,14 @@ import logging
 from uuid import uuid4
 
 from .const import (
+    API_BODY,
     API_CONTEXT,
     API_DIRECTIVE,
     API_ENDPOINT,
     API_EVENT,
     API_HEADER,
     API_PAYLOAD,
+    API_REQUEST,
     API_SCOPE,
 )
 from .entities import ENTITY_ADAPTERS
@@ -96,6 +98,33 @@ class AlexaDirective:
         )
 
         return self.response(name="ErrorResponse", namespace=namespace, payload=payload)
+
+
+class AlexaRequest:
+    """An incoming Alexa request."""
+
+    PROACTIVE_SUBSCRIPTION_CHANGED = "AlexaSkillEvent.ProactiveSubscriptionChanged"
+    SKILL_ACCOUNT_LINKED = "AlexaSkillEvent.SkillAccountLinked"
+    SKILL_ENABLED = "AlexaSkillEvent.SkillEnabled"
+    SKILL_DISABLED = "AlexaSkillEvent.SkillDisabled"
+    SKILL_PERMISSIONACCEPTED = "AlexaSkillEvent.SkillPermissionAccepted"
+
+    def __init__(self, message):
+        """Initialize a directive."""
+        self._request = message[API_REQUEST]
+        self.body = self._request[API_BODY]
+        self.context = message[API_CONTEXT]
+
+    @property
+    def type(self):
+        """Return the type of this response."""
+        return self._request["type"]
+
+    @property
+    def user(self):
+        """Return the user object."""
+        system = self.context["System"]
+        return system["user"]
 
 
 class AlexaResponse:
@@ -203,12 +232,12 @@ class AlexaProactiveEvent:
     def __init__(self, payload=None):
         """Initialize the notification."""
         payload = payload or {}
-        self._response = {API_EVENT: {"name": self.event_name, API_PAYLOAD: payload}}
+        self._event = {API_EVENT: {"name": self.event_name, API_PAYLOAD: payload}}
 
     @property
     def name(self):
         """Return the name of this response."""
-        return self._response[API_EVENT]["name"]
+        return self._event[API_EVENT]["name"]
 
     @staticmethod
     def localized_attributes():
@@ -217,7 +246,7 @@ class AlexaProactiveEvent:
 
     def serialize(self):
         """Return response as a JSON-able data structure."""
-        return self._response
+        return self._event
 
 
 class AlexaMessageAlert(AlexaProactiveEvent):
