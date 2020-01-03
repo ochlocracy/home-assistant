@@ -33,7 +33,7 @@ async def async_enable_proactive_mode(hass, smart_home_config):
             return
 
         if not smart_home_config.should_expose(changed_entity):
-            _LOGGER.debug("Not exposing %s because filtered by config", changed_entity)
+            # _LOGGER.debug("Not exposing %s because filtered by config", changed_entity)
             return
 
         alexa_changed_entity = ENTITY_ADAPTERS[new_state.domain](

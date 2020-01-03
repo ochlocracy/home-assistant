@@ -16,16 +16,11 @@ EVENT_ALEXA_SMART_HOME = "alexa_smart_home"
 async def async_handle_message(hass, config, request, context=None, enabled=True):
     """Handle incoming API messages.
 
-    If enabled is False, the response to all messages will be a
+    If enabled is False, the response to all messagess will be a
     BRIDGE_UNREACHABLE error. This can be used if the API has been disabled in
     configuration.
     """
-    if request.get("request"):
-        req = request.get("request")
-        req_type = req["type"]
-
-    if request.get(API_DIRECTIVE):
-        assert request[API_DIRECTIVE][API_HEADER]["payloadVersion"] == "3"
+    assert request[API_DIRECTIVE][API_HEADER]["payloadVersion"] == "3"
 
     if context is None:
         context = ha.Context()

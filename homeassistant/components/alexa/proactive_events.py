@@ -1,75 +1,83 @@
-"""Alexa proactive events code."""
-import asyncio
-import json
+"""Alexa models."""
 import logging
+from uuid import uuid4
 
-import aiohttp
-import async_timeout
-
-from homeassistant.const import MATCH_ALL, STATE_ON
-import homeassistant.util.dt as dt_util
-
-from .const import API_CHANGE, Cause
+from .const import (
+    API_BODY,
+    API_CONTEXT,
+    API_DIRECTIVE,
+    API_ENDPOINT,
+    API_EVENT,
+    API_HEADER,
+    API_PAYLOAD,
+    API_REQUEST,
+    API_SCOPE,
+)
 from .entities import ENTITY_ADAPTERS
-from .messages import AlexaResponse
+from .errors import AlexaInvalidEndpointError
 
 _LOGGER = logging.getLogger(__name__)
-DEFAULT_TIMEOUT = 10
 
 
-async def async_send_proactive_event_message(
-    hass, config, alexa_entity, *, invalidate_access_token=True
-):
-    """Send a proavtive event.
+class AlexaProactiveEvent:
+    """Base class for Alexa proactive event notification."""
 
-    https://developer.amazon.com/en-US/docs/alexa/smapi/proactive-events-api.html
-    """
-    token = await config.async_get_access_token()
+    event_name = None
 
-    headers = {"Authorization": f"Bearer {token}"}
+    def __init__(self, payload=None):
+        """Initialize the notification."""
+        payload = payload or {}
+        self._event = {API_EVENT: {"name": self.event_name, API_PAYLOAD: payload}}
 
-    payload = {}
+    @property
+    def name(self):
+        """Return the name of this response."""
+        return self._event[API_EVENT]["name"]
 
-    message = AlexaResponse(name="ChangeReport", namespace="Alexa", payload=payload)
-    message.set_endpoint_full(token, endpoint)
+    @staticmethod
+    def localized_attributes():
+        """Returns the localized attributes."""
+        return None
 
-    message_serialized = message.serialize()
-    session = hass.helpers.aiohttp_client.async_get_clientsession()
+    def serialize(self):
+        """Return response as a JSON-able data structure."""
+        return self._event
 
-    try:
-        with async_timeout.timeout(DEFAULT_TIMEOUT):
-            response = await session.post(
-                config.endpoint,
-                headers=headers,
-                json=message_serialized,
-                allow_redirects=True,
-            )
 
-    except (asyncio.TimeoutError, aiohttp.ClientError):
-        _LOGGER.error("Timeout sending report to Alexa.")
-        return
+class AlexaMessageAlert(AlexaProactiveEvent):
+    """Message reminder proactive event."""
 
-    response_text = await response.text()
+    event_name = "AMAZON.MessageAlert.Activated"
 
-    _LOGGER.debug("Sent: %s", json.dumps(message_serialized))
-    _LOGGER.debug("Received (%s): %s", response.status, response_text)
+    def __init__(self, payload=None):
+        """Initialize the notification."""
+        payload = payload or {
+            "state": {"status": "UNREAD", "freshness": "NEW"},
+            "messageGroup": {
+                "creator": {"name": "Andy"},
+                "count": 5,
+                "urgency": "URGENT",
+            },
+        }
+        super().__init__(payload)
 
-    if response.status == 202:
-        return
 
-    response_json = json.loads(response_text)
+class AlexaWeatherAlert(AlexaProactiveEvent):
+    """Weather alert proactive event."""
 
-    if (
-        response_json["payload"]["code"] == "INVALID_ACCESS_TOKEN_EXCEPTION"
-        and not invalidate_access_token
-    ):
-        config.async_invalidate_access_token()
-        return await async_send_changereport_message(
-            hass, config, alexa_entity, invalidate_access_token=False
-        )
+    event_name = "AMAZON.WeatherAlert.Activated"
 
-    _LOGGER.error(
-        "Error when sending ChangeReport to Alexa: %s: %s",
-        response_json["payload"]["code"],
-        response_json["payload"]["description"],
-    )
+    def __init__(self, payload=None):
+        """Initialize the notification."""
+        payload = payload or {
+            "weatherAlert": {
+                "source": "localizedattribute:source",
+                "alertType": "TORNADO",
+            }
+        }
+        super().__init__(payload)
+
+    def localized_attributes(self):
+        """Returns the localized attributes."""
+        localized_attributes = [{"locale": "en-US", "source": "Example Weather Corp"}]
+        return localized_attributes

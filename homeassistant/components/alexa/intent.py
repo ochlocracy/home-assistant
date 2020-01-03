@@ -118,6 +118,19 @@ async def async_handle_message(hass, message):
     return await handler(hass, message)
 
 
+@HANDLERS.register("AlexaSkillEvent.ProactiveSubscriptionChanged")
+@HANDLERS.register("AlexaSkillEvent.SkillAccountLinked")
+@HANDLERS.register("AlexaSkillEvent.SkillEnabled")
+@HANDLERS.register("AlexaSkillEvent.SkillDisabled")
+@HANDLERS.register("AlexaSkillEvent.SkillPermissionAccepted")
+async def async_handle_skill_event(hass, message):
+    """Handle a skill event request."""
+    req = message.get("request")
+    alexa_intent_info = req.get("intent")
+    alexa_response = AlexaResponse(hass, alexa_intent_info)
+    return {}
+
+
 @HANDLERS.register("SessionEndedRequest")
 async def async_handle_session_end(hass, message):
     """Handle a session end request."""
