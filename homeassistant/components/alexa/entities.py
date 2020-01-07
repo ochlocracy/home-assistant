@@ -21,6 +21,7 @@ from homeassistant.components import (
     switch,
     timer,
     vacuum,
+    water_heater,
 )
 from homeassistant.components.climate import const as climate
 from homeassistant.const import (
@@ -752,5 +753,21 @@ class VacuumCapabilities(AlexaEntity):
                 self.entity, allow_remote_resume=support_resume
             )
 
+        yield AlexaEndpointHealth(self.hass, self.entity)
+        yield Alexa(self.hass)
+
+
+@ENTITY_ADAPTERS.register(water_heater.DOMAIN)
+class WaterHeaterCapabilities(AlexaEntity):
+    """Class to represent water heater capabilities."""
+
+    def default_display_categories(self):
+        """Return the display categories for this entity."""
+        return [DisplayCategory.THERMOSTAT, DisplayCategory.TEMPERATURE_SENSOR]
+
+    def interfaces(self):
+        """Yield the supported interfaces."""
+        yield AlexaThermostatController(self.hass, self.entity)
+        yield AlexaTemperatureSensor(self.hass, self.entity)
         yield AlexaEndpointHealth(self.hass, self.entity)
         yield Alexa(self.hass)

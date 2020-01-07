@@ -8,6 +8,7 @@ from homeassistant.components import (
     input_number,
     light,
     vacuum,
+    water_heater,
 )
 from homeassistant.components.alarm_control_panel import ATTR_CODE_FORMAT, FORMAT_NUMBER
 import homeassistant.components.climate.const as climate
@@ -770,6 +771,10 @@ class AlexaTemperatureSensor(AlexaCapability):
             unit = self.hass.config.units.temperature_unit
             temp = self.entity.attributes.get(climate.ATTR_CURRENT_TEMPERATURE)
 
+        if self.entity.domain == water_heater.DOMAIN:
+            unit = self.entity.temperature_unit
+            temp = self.entity.attributes.get(water_heater.ATTR_CURRENT_TEMPERATURE)
+
         if temp in (STATE_UNAVAILABLE, STATE_UNKNOWN, None):
             return None
 
@@ -895,13 +900,23 @@ class AlexaThermostatController(AlexaCapability):
 
     def properties_supported(self):
         """Return what properties this entity supports."""
-        properties = [{"name": "thermostatMode"}]
+        properties = []
         supported = self.entity.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
-        if supported & climate.SUPPORT_TARGET_TEMPERATURE:
-            properties.append({"name": "targetSetpoint"})
-        if supported & climate.SUPPORT_TARGET_TEMPERATURE_RANGE:
-            properties.append({"name": "lowerSetpoint"})
-            properties.append({"name": "upperSetpoint"})
+
+        if self.entity.domain == climate.DOMAIN:
+            properties.append({"name": "thermostatMode"})
+            if supported & climate.SUPPORT_TARGET_TEMPERATURE:
+                properties.append({"name": "targetSetpoint"})
+            if supported & climate.SUPPORT_TARGET_TEMPERATURE_RANGE:
+                properties.append({"name": "lowerSetpoint"})
+                properties.append({"name": "upperSetpoint"})
+
+        if self.entity.domain == water_heater.DOMAIN:
+            if supported & water_heater.SUPPORT_OPERATION_MODE:
+                properties.append({"name": "thermostatMode"})
+            if supported & water_heater.SUPPORT_TARGET_TEMPERATURE:
+                properties.append({"name": "targetSetpoint"})
+
         return properties
 
     def properties_proactively_reported(self):
@@ -914,27 +929,35 @@ class AlexaThermostatController(AlexaCapability):
 
     def get_property(self, name):
         """Read and return a property."""
-        if self.entity.state == STATE_UNAVAILABLE:
+        if self.entity.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             return None
 
         if name == "thermostatMode":
-            preset = self.entity.attributes.get(climate.ATTR_PRESET_MODE)
+            if self.entity.domain == water_heater.DOMAIN:
+                # TODO Add Support for thermostateMode
+                return None
 
-            if preset in API_THERMOSTAT_PRESETS:
-                mode = API_THERMOSTAT_PRESETS[preset]
-            else:
-                mode = API_THERMOSTAT_MODES.get(self.entity.state)
-                if mode is None:
-                    _LOGGER.error(
-                        "%s (%s) has unsupported state value '%s'",
-                        self.entity.entity_id,
-                        type(self.entity),
-                        self.entity.state,
-                    )
-                    raise UnsupportedProperty(name)
-            return mode
+            if self.entity.domain == climate.DOMAIN:
+                preset = self.entity.attributes.get(climate.ATTR_PRESET_MODE)
+                if preset in API_THERMOSTAT_PRESETS:
+                    mode = API_THERMOSTAT_PRESETS[preset]
+                else:
+                    mode = API_THERMOSTAT_MODES.get(self.entity.state)
+                    if mode is None:
+                        _LOGGER.error(
+                            "%s (%s) has unsupported state value '%s'",
+                            self.entity.entity_id,
+                            type(self.entity),
+                            self.entity.state,
+                        )
+                        raise UnsupportedProperty(name)
+                return mode
 
-        unit = self.hass.config.units.temperature_unit
+        if self.entity.domain == water_heater.DOMAIN:
+            unit = self.entity.temperature_unit
+        else:
+            unit = self.hass.config.units.temperature_unit
+
         if name == "targetSetpoint":
             temp = self.entity.attributes.get(ATTR_TEMPERATURE)
         elif name == "lowerSetpoint":
