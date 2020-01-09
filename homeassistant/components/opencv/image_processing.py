@@ -57,13 +57,13 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
                 vol.Schema(
                     {
                         vol.Required(CONF_FILE): cv.isfile,
-                        vol.Optional(CONF_SCALE, DEFAULT_SCALE): float,
+                        vol.Optional(CONF_SCALE, DEFAULT_SCALE): vol.All(
+                            vol.Coerce(float), vol.Range(min=-1.01, max=3.00)
+                        ),
                         vol.Optional(
                             CONF_NEIGHBORS, DEFAULT_NEIGHBORS
                         ): cv.positive_int,
-                        vol.Optional(CONF_MIN_SIZE, DEFAULT_MIN_SIZE): vol.Schema(
-                            (int, int)
-                        ),
+                        vol.Optional(CONF_MIN_SIZE, DEFAULT_MIN_SIZE): vol.Schema((int, int)),
                     }
                 ),
             )
