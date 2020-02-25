@@ -1554,11 +1554,7 @@ async def test_cover_position_range(hass):
     assert appliance["friendlyName"] == "Test cover range"
 
     capabilities = assert_endpoint_capabilities(
-        appliance,
-        "Alexa.PowerController",
-        "Alexa.RangeController",
-        "Alexa.EndpointHealth",
-        "Alexa",
+        appliance, "Alexa.RangeController", "Alexa.EndpointHealth", "Alexa"
     )
 
     range_capability = get_capability(capabilities, "Alexa.RangeController")
@@ -2648,11 +2644,7 @@ async def test_cover_position_mode(hass):
     assert appliance["friendlyName"] == "Test cover mode"
 
     capabilities = assert_endpoint_capabilities(
-        appliance,
-        "Alexa.PowerController",
-        "Alexa.ModeController",
-        "Alexa.EndpointHealth",
-        "Alexa",
+        appliance, "Alexa.ModeController", "Alexa.EndpointHealth", "Alexa"
     )
 
     mode_capability = get_capability(capabilities, "Alexa.ModeController")
@@ -2871,11 +2863,7 @@ async def test_cover_tilt_position_range(hass):
     assert appliance["friendlyName"] == "Test cover tilt range"
 
     capabilities = assert_endpoint_capabilities(
-        appliance,
-        "Alexa.PowerController",
-        "Alexa.RangeController",
-        "Alexa.EndpointHealth",
-        "Alexa",
+        appliance, "Alexa.RangeController", "Alexa.EndpointHealth", "Alexa"
     )
 
     range_capability = get_capability(capabilities, "Alexa.RangeController")
@@ -2990,11 +2978,7 @@ async def test_cover_semantics_position_and_tilt(hass):
     assert appliance["friendlyName"] == "Test cover semantics"
 
     capabilities = assert_endpoint_capabilities(
-        appliance,
-        "Alexa.PowerController",
-        "Alexa.RangeController",
-        "Alexa.EndpointHealth",
-        "Alexa",
+        appliance, "Alexa.RangeController", "Alexa.EndpointHealth", "Alexa"
     )
 
     # Assert for Position Semantics

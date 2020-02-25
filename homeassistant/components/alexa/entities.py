@@ -408,7 +408,8 @@ class CoverCapabilities(AlexaEntity):
     def interfaces(self):
         """Yield the supported interfaces."""
         device_class = self.entity.attributes.get(ATTR_DEVICE_CLASS)
-        if device_class != cover.DEVICE_CLASS_GARAGE:
+        locale = self.config.locale
+        if device_class != cover.DEVICE_CLASS_GARAGE or locale not in {"en-US", "de-DE"}:
             yield AlexaPowerController(self.entity)
 
         supported = self.entity.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
