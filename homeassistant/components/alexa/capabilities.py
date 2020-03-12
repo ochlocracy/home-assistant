@@ -1287,7 +1287,9 @@ class AlexaModeController(AlexaCapability):
         effect_list = self.entity.attributes.get(light.ATTR_EFFECT_LIST)
 
         if self.instance == f"{light.DOMAIN}.{light.ATTR_EFFECT}":
-            self._resource = AlexaModeResource(["Effect"], False)
+            self._resource = AlexaModeResource(
+                ["Effect", AlexaGlobalCatalog.SETTING_MODE], False
+            )
             if light.EFFECT_COLORLOOP in effect_list:
                 self._resource.add_mode(
                     f"{light.ATTR_EFFECT}.{light.EFFECT_COLORLOOP}",
