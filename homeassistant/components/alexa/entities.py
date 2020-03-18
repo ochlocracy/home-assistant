@@ -61,6 +61,7 @@ from .capabilities import (
     AlexaPowerController,
     AlexaPowerLevelController,
     AlexaRangeController,
+    AlexaRTCSessionController,
     AlexaSceneController,
     AlexaSecurityPanelController,
     AlexaSeekController,
@@ -786,7 +787,7 @@ class CameraCapabilities(AlexaEntity):
             supported = self.entity.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
             if supported & camera.SUPPORT_STREAM:
                 yield AlexaCameraStreamController(self.entity)
-
+                yield AlexaRTCSessionController(self.entity)
         yield AlexaEndpointHealth(self.hass, self.entity)
         yield Alexa(self.hass)
 
@@ -807,3 +808,4 @@ class CameraCapabilities(AlexaEntity):
             return False
 
         return True
+

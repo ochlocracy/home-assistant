@@ -1550,3 +1550,46 @@ async def async_api_initialize_camera_stream(hass, config, directive, context):
     return directive.response(
         name="Response", namespace="Alexa.CameraStreamController", payload=payload
     )
+
+
+@HANDLERS.register(("Alexa.RTCSessionController", "InitiateSessionWithOffer"))
+async def async_api_initiate_session_with_offer(hass, config, directive, context):
+    """Process a RTCSessionController InitiateSessionWithOffer request."""
+    offer = directive.payload["offer"]
+    if offer.format != "SDP":
+        msg = "Entity does not support directive"
+        raise AlexaInvalidDirectiveError(msg)
+
+    payload = {"answer": {"format": offer.format, "value": "v=0 a="}}
+
+    return directive.response(
+        name="AnswerGeneratedForSession",
+        namespace="Alexa.RTCSessionController",
+        payload=payload,
+    )
+
+
+@HANDLERS.register(("Alexa.RTCSessionController", "SessionConnected"))
+async def async_api_session_connected(hass, config, directive, context):
+    """Process a RTCSessionController SessionConnected request."""
+    session_id = directive.payload["sessionId"]
+
+    payload = {"sessionId": session_id}
+
+    return directive.response(
+        name="SessionConnected", namespace="Alexa.RTCSessionController", payload=payload
+    )
+
+
+@HANDLERS.register(("Alexa.RTCSessionController", "SessionDisconnected"))
+async def async_api_session_disconnected(hass, config, directive, context):
+    """Process a RTCSessionController SessionDisconnected request."""
+    session_id = directive.payload["sessionId"]
+
+    payload = {"sessionId": session_id}
+
+    return directive.response(
+        name="SessionDisconnected",
+        namespace="Alexa.RTCSessionController",
+        payload=payload,
+    )
