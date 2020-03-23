@@ -260,7 +260,16 @@ async def async_api_set_color_temperature(hass, config, directive, context):
         context=context,
     )
 
-    return directive.response()
+    response = directive.response()
+    response.add_context_property(
+        {
+            "name": "colorTemperatureInKelvin",
+            "namespace": "Alexa.ColorTemperatureController",
+            "value": kelvin,
+        }
+    )
+
+    return response
 
 
 @HANDLERS.register(("Alexa.ColorTemperatureController", "DecreaseColorTemperature"))
