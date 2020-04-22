@@ -808,4 +808,3 @@ class CameraCapabilities(AlexaEntity):
             return False
 
         return True
-

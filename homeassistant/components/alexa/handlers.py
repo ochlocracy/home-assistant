@@ -2,6 +2,7 @@
 import logging
 import math
 
+from aiortc import RTCSessionDescription, RTCPeerConnection
 from homeassistant import core as ha
 from homeassistant.components import (
     camera,
@@ -1560,7 +1561,12 @@ async def async_api_initiate_session_with_offer(hass, config, directive, context
         msg = "Entity does not support directive"
         raise AlexaInvalidDirectiveError(msg)
 
-    payload = {"answer": {"format": offer.format, "value": "v=0 a="}}
+    offer = RTCSessionDescription(sdp=offer.value, type="offer")
+    pc = RTCPeerConnection()
+    await pc.setRemoteDescription(offer)
+    await pc.setLocalDescription(await pc.createAnswer())
+
+    payload = {"answer": {"format": "SDP", "value": pc.localDescription}}
 
     return directive.response(
         name="AnswerGeneratedForSession",
